@@ -1,0 +1,4 @@
+select * from compliance.test_2575_att t1 
+where exists 
+      (select 1 from compliance.test_2575_att t2 
+       where t1.gid = t2.gid and t1.gid_centr <> t2.gid_centr and t1.shortest_distance =t2.shortest_distance);
