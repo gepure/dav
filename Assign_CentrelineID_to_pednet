@@ -1,0 +1,73 @@
+Rename compliance.pednet_substring and compliance.pednet_substring_addr with your own tables in the queries below if you want to play with it.
+
+Step 1. 
+create table compliance.pednet_substring as select gid, ST_LineSubstring(geom, 0.333, 0.666) as geom from compliance.pednet;
+
+Step 2.
+alter table compliance.pednet_substring 
+add column centreline integer,
+add column linear_nam integer,
+add column linear_n_1 character varying,
+add column linear_n_2 character varying,
+add column linear_n_3 character varying,
+add column linear_n_4 character varying,
+add column address_l character varying,
+add column address_r character varying,
+add column parity_l character varying,
+add column parity_r character varying,
+add column lo_num_l integer,
+add column lo_num_r integer,
+add column hi_num_l integer,
+add column hi_num_r integer,
+add column from_inter integer,
+add column to_interse integer,
+add column oneway_dir integer,
+add column oneway_d_1 character varying,
+add column feature_co integer,
+add column feature__1 character varying,
+add column pt2 geometry,
+add column shortest_distance integer;
+
+Step 3.
+create table compliance.pednet_substring_addr as select * from compliance.pednet_substring;
+
+Step 4.
+truncate compliance.pednet_substring_addr;
+
+Step 5
+DO $$ 
+BEGIN
+    FOR t IN 1..85620 loop
+   insert into compliance.pednet_substring_addr (select 
+l.gid,
+l.geom,                                                                                                                                   
+p.centreline,
+p.linear_nam,
+p.linear_n_1,
+p.linear_n_2,
+p.linear_n_3,
+p.linear_n_4,
+p.address_l,
+p.address_r,
+p.parity_l,
+p.parity_r,
+p.lo_num_l,
+p.lo_num_r,
+p.hi_num_l,
+p.hi_num_r,
+p.from_inter,
+p.to_interse,
+p.oneway_dir,
+p.oneway_d_1,
+p.feature_co,
+p.feature__1,
+(ST_ClosestPoint(p.geom,l.geom)) As pt2, 
+st_distance(st_closestpoint(l.geom, p.geom), p.geom) as shortest_distance
+    from compliance.centreline p, compliance.pednet_substring l
+    where p.gid=t
+    order by shortest_distance asc
+    limit 1);
+            raise notice 'counter: %',t;
+            end loop;
+end; 
+$$
