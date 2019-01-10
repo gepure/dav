@@ -1,0 +1,3 @@
+select centreline_id from cityprj.centreline where LINEAR_NAME_FULL='Milner Ave'; and linear_name_id='785';
+
+select x,y from cityprj.address_point where centreline_id in (select centreline_id from cityprj.centreline where LINEAR_NAME_FULL='Eglinton Sq') and address_number='70';
