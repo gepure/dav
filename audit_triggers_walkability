@@ -1,0 +1,23 @@
+alter table compliance.att_pednet_all_in 
+add column last_change_timestamp timestamp,
+add column last_change_user character varying;
+
+CREATE OR REPLACE FUNCTION last_change_timestamp_column()   
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.last_change_timestamp = now();
+      RETURN NEW;   
+END;
+$$ language 'plpgsql';
+
+CREATE OR REPLACE FUNCTION last_change_user_column()   
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.last_change_user = user;
+      RETURN NEW;   
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER last_change_timestamp_trg BEFORE UPDATE ON compliance.att_pednet_all_in FOR EACH ROW EXECUTE PROCEDURE  last_change_timestamp_column();
+
+CREATE TRIGGER last_change_user_trg BEFORE UPDATE ON compliance.att_pednet_all_in FOR EACH ROW EXECUTE PROCEDURE  last_change_user_column();
