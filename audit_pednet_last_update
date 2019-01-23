@@ -1,0 +1,50 @@
+alter table compliance.pednet_atest 
+add column last_change_timestamp timestamp,
+add column last_change_user character varying,
+add column last_change_ipaddr character varying,
+add column last_used_application character varying:
+
+CREATE OR REPLACE FUNCTION last_change_timestamp_column()   
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.last_change_timestamp = now();
+      RETURN NEW;   
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER last_change_timestamp_trg BEFORE UPDATE ON compliance.pednet_atest FOR EACH ROW EXECUTE PROCEDURE  last_change_timestamp_column();
+
+CREATE OR REPLACE FUNCTION last_change_user_column()   
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.last_change_user = user;
+      RETURN NEW;   
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER last_change_user_trg BEFORE UPDATE ON compliance.pednet_atest FOR EACH ROW EXECUTE PROCEDURE  last_change_user_column();
+
+CREATE OR REPLACE FUNCTION last_change_ipaddr_column()   
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.last_change_ipaddr = inet_client_addr();
+      RETURN NEW;   
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER last_change_ipaddr_trg BEFORE UPDATE ON compliance.pednet_atest FOR EACH ROW EXECUTE PROCEDURE  last_change_ipaddr_column();
+
+CREATE OR REPLACE FUNCTION last_used_application_column()   
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.last_used_application = current_setting('application_name');
+      RETURN NEW;   
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER last_used_application_trg BEFORE UPDATE ON compliance.pednet_atest FOR EACH ROW EXECUTE PROCEDURE  last_used_application_column();
+
+
+select crosswalk, road_type,gid, last_change_timestamp,last_change_user, last_change_ipaddr, last_used_application  from compliance.pednet_atest where gid=4394;
+
+
